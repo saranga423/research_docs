@@ -1,28 +1,9 @@
-
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "services": {
-    "client": {
-      "root": "client",
-      "framework": "vite"
-    },
-    "server": {
-      "root": "server",
-      "runtime": "node"
-    }
-  },
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": {
-        "service": "server"
-      }
-    },
-    {
       "source": "/(.*)",
-      "destination": {
-        "service": "client"
-      }
+      "destination": "/"
     }
   ]
 }
