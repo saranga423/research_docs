@@ -75,16 +75,18 @@ The analysis shows that **[summary of outcomes]**. These results suggest that **
 
 ---
 
-## How to Run the Project
+## Run the Client
+
+From the `client` directory, install the dependencies and start the development server:
+
 ```bash
-# Clone repository
-git clone https://github.com/username/repository.git
+npm install
+npm run dev
+```
 
-# Navigate to project directory
-cd repository
+You can also use `npm start` to start the same Vite development server. To create a
+production build, run `npm run build`.
 
-# Install dependencies
-pip install -r requirements.txt
-
-# Run main script
-python main.py
+The document and presentation lists are maintained in `src/data/library.js`. Put
+the files in `public` (or a subfolder inside it) and add their public URLs to that
+catalog. The public library does not require MongoDB or the server API.

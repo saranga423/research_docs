@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { downloadFile } from '../utils/downloadFile'
 
 export default function PptCard({ ppt }) {
   const [hovered, setHovered] = useState(false)
@@ -16,12 +17,6 @@ export default function PptCard({ ppt }) {
     event = '',
   } = ppt || {}
 
-  // Extract filename safely
-  const getFileName = (url) => {
-    if (!url) return 'presentation.pptx'
-    return url.split('/').pop()
-  }
-
   const handleDownload = async (e) => {
     e.preventDefault()
     e.stopPropagation()
@@ -31,41 +26,10 @@ export default function PptCard({ ppt }) {
     setDownloading(true)
 
     try {
-      // CASE 1: backend API download (recommended)
-      if (fileUrl.startsWith('/api') || fileUrl.startsWith('http')) {
-        const response = await fetch(fileUrl)
-
-        if (!response.ok) throw new Error('Download failed')
-
-        const blob = await response.blob()
-        const url = window.URL.createObjectURL(blob)
-
-        const a = document.createElement('a')
-        a.href = url
-        a.download = getFileName(fileUrl)
-
-        document.body.appendChild(a)
-        a.click()
-
-        a.remove()
-        window.URL.revokeObjectURL(url)
-      }
-
-      // CASE 2: static file (public folder)
-      else {
-        const a = document.createElement('a')
-        a.href = fileUrl
-        a.download = getFileName(fileUrl)
-        a.target = '_blank'
-        a.rel = 'noopener noreferrer'
-
-        document.body.appendChild(a)
-        a.click()
-        a.remove()
-      }
+      await downloadFile(fileUrl, 'presentation.pptx')
     } catch (err) {
       console.error('Download error:', err)
-      alert('Failed to download file')
+      alert(`Failed to download file. ${err.message}`)
     } finally {
       setDownloading(false)
     }

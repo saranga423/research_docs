@@ -1,59 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import PptCard from '../components/PptCard'
-
-const SAMPLE_PPTS = [
-  // ── Presentations ──
-  {
-    _id: '9',
-    title: 'Project Presentation',
-    description: 'Final project presentation slides.',
-    category: 'Presentations',
-    author: 'Group',
-    year: '2024',
-    fileType: 'PPTX',
-    pages: null,
-    fileUrl: '/uploads/presentations/Presentation.pptx',
-  },
-  {
-    _id: '10',
-    title: 'Research Presentation',
-    description: 'Research methodology and results presentation.',
-    category: 'Presentations',
-    author: 'Group',
-    year: '2024',
-    fileType: 'PPTX',
-    pages: null,
-    fileUrl: '/uploads/presentations/Research_Presentation.pptx',
-  },
-]
-
-const CATEGORIES = ['All', ...Array.from(new Set(SAMPLE_PPTS.map(p => p.category)))]
+import { presentations } from '../data/library'
 
 export default function Presentations() {
-  const [ppts, setPpts]         = useState([])
-  const [loading, setLoading]   = useState(true)
   const [search, setSearch]     = useState('')
   const [category, setCategory] = useState('All')
   const [view, setView]         = useState('grid') // 'grid' | 'list'
 
-  useEffect(() => {
-    const fetchPpts = async () => {
-      try {
-        const res = await fetch('/api/presentations')
-        if (!res.ok) throw new Error()
-        const data = await res.json()
-        console.log("PRESENTATION API RESPONSE:", data)
-        setPpts(data)
-      } catch {
-        setPpts(SAMPLE_PPTS)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchPpts()
-  }, [])
+  const categories = ['All', ...new Set(presentations.map(ppt => ppt.category).filter(Boolean))]
 
-  const filtered = ppts.filter(p => {
+  const filtered = presentations.filter(p => {
     const title = (p.title || '').toLowerCase()
     const presenter = (p.presenter || '').toLowerCase()
     const event = (p.event || '').toLowerCase()
@@ -125,7 +81,7 @@ export default function Presentations() {
 
       {/* Category filter */}
       <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
-        {CATEGORIES.map(cat => (
+        {categories.map(cat => (
           <button key={cat} onClick={() => setCategory(cat)} style={{
             padding: '0.5rem 1rem', borderRadius: '20px', fontSize: '0.82rem',
             fontWeight: category === cat ? 500 : 400,
@@ -139,27 +95,11 @@ export default function Presentations() {
 
       {/* Count */}
       <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.5rem', fontFamily: 'var(--font-mono)' }}>
-        {loading ? 'Loading…' : `${filtered.length} presentation${filtered.length !== 1 ? 's' : ''} found`}
+        {`${filtered.length} presentation${filtered.length !== 1 ? 's' : ''} found`}
       </p>
 
       {/* Content */}
-      {loading ? (
-        <div className="cards-grid">
-          {[1,2,3,4,5,6].map(i => (
-            <div key={i} style={{
-              background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-              borderRadius: 'var(--radius-lg)', overflow: 'hidden',
-            }}>
-              <div style={{ height: 140, background: 'var(--bg-secondary)' }}/>
-              <div style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {[12, 80, 50, 40].map((h, j) => (
-                  <div key={j} style={{ height: h, borderRadius: 6, background: 'var(--bg-secondary)', opacity: 0.7 }}/>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : filtered.length === 0 ? (
+      {filtered.length === 0 ? (
         <div className="empty-state">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
             <rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.4"/>
@@ -169,11 +109,11 @@ export default function Presentations() {
         </div>
       ) : view === 'grid' ? (
         <div className="cards-grid">
-          {filtered.map(p => <PptCard key={p._id} ppt={p} />)}
+          {filtered.map(ppt => <PptCard key={ppt._id} ppt={ppt} />)}
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          {filtered.map(p => <PptListRow key={p._id} ppt={p} />)}
+          {filtered.map(ppt => <PptListRow key={ppt._id} ppt={ppt} />)}
         </div>
       )}
     </div>
